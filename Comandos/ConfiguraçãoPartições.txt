@@ -1,0 +1,6 @@
+/home 250 MB
+/swap 2GB
+/var 500MB
+/tmp 200 MB
+/boot 350MB
+/     5GB

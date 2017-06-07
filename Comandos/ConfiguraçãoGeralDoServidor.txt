@@ -1,0 +1,51 @@
+hostname: apresenta o nome do servidor e o eu dominio
+para mudar o nome do servido basta digitar hostname servido1 .. mas quando reiniciar maquina volta ao nome padrao
+hostnamectl set-hostname krove     definitivo
+
+vi /etc/hosts
+192.168.100.100 krove.pagottome.corp krove
+apos aperta esc e digitar :wq
+
+placas de redes ip a
+
+configurando as duas placas de rede interna e a web
+
+cd /etc/sysconfig/network-scripts/
+
+vi ifcfg-enp0s8
+peerdns=no todos o ipv6 = no
+NM_CONTROLLED=NO
+
+vi ifcfg-enp0s3
+peerdns=no todos o ipv6 = no
+BOOTPROTO=NONE
+PEERDNS=NO
+IPADdR=192.168.100.100
+NETMASK=255.255.255.0
+DNS1=192.168.100.100
+DN2=8.8.8.8
+DOMAIN=PAGOTTOME.CORP
+
+nm_controlled=no
+
+VI /ETC/RESOLV.CONF
+
+SEARCH PAGOTTOME.CORP
+NAMESERVER 192.168.100.100
+NAMESERVER 8.8.8.8
+
+VI /ETC/SYSCONFIG/NETWORK
+NETWORKING=yes
+hostname=krove
+
+reiniciando o servidores e placas
+
+/etc/init.d/network restart
+
+configurando pois pode ser versão apresentacao registrar a versao 
+
+subscription-manager register --autosubscribe --force
+
+putty para atualizar servidor yum update
+yum -y groupinstall 'Development Tools'
+yum -y install vim net-tools
