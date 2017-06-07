@@ -1,0 +1,77 @@
+BIND (DNS)
+============
+
+# yum -y install  bind bind-utils
+# vim /etc/named.conf
+
+
+=============================
+
+	forwarders {
+                8.8.8.8;
+               
+        };
+
+
+=============================
+
+zone "minhaempresa.corp" IN {
+        type master;
+        file "minhaempresa.corp.db";
+};
+
+zone "192.168.100.in-addr.arpa" IN {
+        type master;
+        file "192.168.100.db";
+};
+
+===============================
+
+# vim /var/named/minhaempresa.corp.db
+
+$TTL 24h
+@       IN      SOA     dns.minhaempresa.corp. root.minhaempresa.corp. (
+        1               ; Serial
+        12h             ; Refresh
+        15m             ; Retry
+        3w              ; Expire
+        2h              ; Mininum TTL
+)
+
+@       IN      NS      dns.minhaempresa.corp.
+dns     IN      A       192.168.100.100
+
+servidor1  IN      A       192.168.100.100
+servidor2  IN      A       192.168.100.101
+www        IN      A       192.168.100.101
+email      IN      A       192.168.100.101
+
+
+
+# vim /var/named/192.168.100.db
+
+$TTL 24h
+@       IN      SOA     dns.minhaempresa.corp. root.minhaempresa.corp. (
+        1               ; Serial
+        12h             ; Refresh
+        15m             ; Retry
+        3w              ; Expire
+        2h              ; Mininum TTL
+)
+
+@        IN      NS      dns.minhaempresa.corp.
+100      IN      PTR     dns.minhaempresa.corp.
+
+101      IN      PTR     email.minhaempresa.corp.
+101      IN      PTR     www.minhaempresa.corp.
+100      IN      PTR     servidor1.minhaempresa.corp.
+101      IN      PTR     servidor2.minhaempresa.corp.
+
+========================================================
+
+
+# firewall-cmd --permanent --add-service=dns
+# firewall-cmd --complete-reload
+
+# systemctl enable named.service
+# systemctl start named.service

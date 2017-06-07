@@ -1,0 +1,35 @@
+Instalar MariaDB
+=================
+
+# yum -y install mariadb-server mariadb 
+# systemctl start mariadb
+# systemctl enable mariadb
+
+Cadastrar senha Root
+=====================
+# mysql_secure_installation
+
+
+Instalar phpMyAdmin
+===================
+# yum -y install epel-release
+# yum -y install phpmyadmin 
+
+Configurar phpMyAdmin
+======================
+
+#vim /etc/httpd/conf.d/phpMyAdmin.conf
+
+
+<Directory /usr/share/phpMyAdmin/>
+        Options none
+        AllowOverride Limit
+        Require all granted
+</Directory>
+
+# vim /etc/phpMyAdmin/config.inc.php
+
+/* Authentication type */
+$cfg['Servers'][$i]['auth_type']     = 'http';    
+
+# systemctl restart httpd

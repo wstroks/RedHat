@@ -1,0 +1,25 @@
+/etc/squid/squid.conf
+======================
+
+
+acl localnet src 192.168.100.0/24  
+
+# firewall-cmd --permanent --add-port=3128/tcp
+
+
+/etc/squid/squid.conf
+======================
+
+acl bloqueio url_regex "/etc/squid/bloqueio"
+
+http_access deny bloqueio !localhost
+http_access allow all
+
+
+
+/etc/squid/bloqueio
+====================
+
+www.twitter.com
+www.facebook.com
+www.gmail.com

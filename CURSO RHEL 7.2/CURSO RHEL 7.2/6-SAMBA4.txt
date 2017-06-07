@@ -1,0 +1,58 @@
+# vim /etc/sysctl.conf
+
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+
+
+
+# yum -y install openldap-devel pam-devel git gcc make wget libacl-devel libblkid-devel gnutls-devel readline-devel python-devel cups-devel libaio-devel quota-devel ctdb-devel krb5-devel krb5-workstation acl setroubleshoot-server setroubleshoot-plugins policycoreutils-python libsemanage-python setools-libs-python setools-libs popt-devel libpcap-devel libidn-devel libxml2-devel libacl-devel libsepol-devel libattr-devel keyutils-libs-devel cyrus-sasl-devel cups-devel bind-utils bind-sdb bind-devel bind-libs bind avahi-devel mingw32-iconv gamin libcap-devel rpc2-devel glusterfs-devel python-dns pkgconfig gdb e2fsprogs-devel zlib-devel sqlite-devel perl attr acl krb5-user ntp bind bind-sdb
+
+
+
+# cd /opt/
+# wget -c https://ftp.samba.org/pub/samba/stable/samba-4.4.4.tar.gz
+# tar -zxvf samba-4.4.4.tar.gz
+# cd samba-4.4.4
+# ./configure.developer
+# make
+# make install
+
+
+# /usr/local/samba/bin/samba-tool domain provision --use-rfc2307 --interactive
+# /usr/local/samba/sbin/samba 
+
+https://wiki.samba.org/index.php/Samba4/InitScript
+
+# vim /etc/rc.d/init.d/samba4
+
+# chmod 755 /etc/rc.d/init.d/samba4
+# chmod +x /etc/rc.d/init.d/samba4
+# ln -s /etc/rc.d/init.d/samba4 /etc/rc3.d/s80samba4
+
+# chkconfig --add samba4
+# chkconfig samba4 on
+# service samba4 restart
+
+# /usr/local/samba/bin/smbclient //localhost/netlogon -Uadministrator%MinhaSenha123
+
+# vim /etc/named.conf
+
+tkey-gssapi-keytab "/usr/local/samba/private/dns.keytab";
+include "/usr/local/samba/private/named.conf";
+
+
+# /usr/local/samba/bin/samba-tool domain provision --use-rfc2307 --interactive
+
+# service samba4 restart
+# service named restart
+
+# cp /etc/krb5.conf krb5.conf.ori
+# cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
+
+# vim /etc/krb5.conf  (somente para checar a definição do domínio)
+# kinit administrator
+# klist -e
+
+# chgrp named /usr/local/samba/private/dns.keytab 
+# chmod g+r /usr/local/samba/private/dns.keytab
+# /usr/local/samba/sbin/samba_dnsupdate --verbose
