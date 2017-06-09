@@ -1,5 +1,0 @@
-Instalar PHP
-=============
-# yum -y install php php-mysql php-gd php-pear 
-# systemctl restart httpd
-
