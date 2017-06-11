@@ -1,0 +1,245 @@
+hostname: apresenta o nome do servidor e o eu dominio
+para mudar o nome do servido basta digitar hostname servido1 .. mas quando reiniciar maquina volta ao nome padrao
+hostnamectl set-hostname krove     definitivo
+
+vi /etc/hosts
+192.168.100.100 krove.pagottome.corp krove
+apos aperta esc e digitar :wq
+
+placas de redes ip a
+
+configurando as duas placas de rede interna e a web
+
+cd /etc/sysconfig/network-scripts/
+
+vi ifcfg-enp0s8
+peerdns=no todos o ipv6 = no
+NM_CONTROLLED=NO
+
+vi ifcfg-enp0s3
+peerdns=no todos o ipv6 = no
+BOOTPROTO=NONE
+PEERDNS=NO
+IPADdR=192.168.100.100
+NETMASK=255.255.255.0
+DNS1=192.168.100.100
+DN2=8.8.8.8
+DOMAIN=PAGOTTOME.CORP
+
+nm_controlled=no
+
+VI /ETC/RESOLV.CONF
+
+SEARCH PAGOTTOME.CORP
+NAMESERVER 192.168.100.100
+NAMESERVER 8.8.8.8
+
+VI /ETC/SYSCONFIG/NETWORK
+NETWORKING=yes
+hostname=krove
+
+reiniciando o servidores e placas
+
+/etc/init.d/network restart
+
+configurando pois pode ser versão apresentacao registrar a versao 
+
+subscription-manager register --autosubscribe --force
+
+putty para atualizar servidor yum update
+yum -y groupinstall 'Development Tools'
+yum -y install vim net-tools
+
+
+gerenciamento de arquivos ...
+
+yum -y install samba-client samba-common ## dah samba
+
+arquivo de configuracao samba
+
+vim /etc/samba/smb.conf
+
+[global]
+
+workgroup = pagottome.corp
+map to guest = bad user
+
+[publica]
+path= /publica/
+writable= yes
+read only= no
+guest ok = yes
+browseable= yes
+
+
+cd / 
+
+mkdir publica criando a pasta 
+
+chmod 777 publica
+
+carregar automaticamente 
+
+systemctl enable smb.service
+
+
+systemctl start smb.service
+vim /etc/sysconfig/selinux
+firewall-cmd --permanent --zone=public --add-service=samba
+chcon -R -t samba_share_t /publica
+firewall-cmd --reload
+
+até aque a pasta é publica ou seja qualquer usuario pode logar na pasta basta ter o ip 
+
+
+agora criando usuario
+adduser -M jose
+adduser -M maria
+groupadd financeiro
+groupadd admin
+gpasswd -a jose financeiro
+gpasswd -a maria admin
+mkdir financeiro
+mkdir admin
+trocando o root
+chown root:financeiro /financeiro
+chown root:admin /admin
+chmod 770 admin
+chmod 770 financeiro
+apos da permissao 
+su jose deh cd /financeiro e verifique a permissao .. su root para sair
+smbpasswd -a jose
+smbpasswd -a maria
+
+vim /etc/samba/smb.conf
+
+[financeiro]
+
+	path= /financeiro/
+writable= yes
+read only= no
+browseable= yes
+valid users= +financeiro
+
+[admin]
+
+	path= /admin/
+writable= yes
+read only= no
+browseable= yes
+valid users= +admin
+
+reiniciar samba
+
+systemctl restart smb.service liberando serviço pelo samba agora falta linux
+chcon -R -t samba_share_t /financeiro
+chcon -R -t samba_share_t /admin
+
+criando uma lixeira ... para backup
+mkdir lixeira
+
+
+
+[lixeira]
+
+	path= /lixeira/
+writable= yes
+read only= no
+browseable= yes
+
+
+[global]
+adicionar
+
+recycle:keeptree = yes
+recycle:versions = yes
+recycle:repository = /lixeira/
+recycle:exclude = *.temp; *.bkp;
+
+
+agora escolhendo a pasta que vc quer que use lixeira
+
+[publica]
+
+vfs objects = recycle
+
+chcon - R -t samba_share_t /lixeira
+systemctl restart smb.service
+
+vetar arquivo em determinadas pastas
+publica
+veto files = *.exe/*.com/*.bat/*.sys
+systemctl resart smb.service
+
+
+
+agora servidor web 
+
+intranet
+
+
+yum -y install httpd
+desabilitar portar 
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --permanent --add-port=455/tcp
+firewall-cmd --reload 
+systemctl restart httpd.service
+systemctl enable httpd.service
+cd /var/www/html
+vi index.html
+
+# yum -y install php php-mysql php-gd php-pear 
+# systemctl restart httpd
+
+troca extensao do arquivo para php
+cp index.html index.php
+rm index.html
+
+# yum -y install mariadb-server mariadb 
+# systemctl start mariadb
+# systemctl enable mariadb
+
+
+Cadastrar senha Root
+=====================
+# mysql_secure_installation
+
+
+Instalar phpMyAdmin
+===================
+# yum -y install epel-release
+# yum -y install phpmyadmin 
+
+Configurar phpMyAdmin
+======================
+
+#vim /etc/httpd/conf.d/phpMyAdmin.conf
+
+colar na linha abaixo do ifmodule
+<Directory /usr/share/phpMyAdmin/>
+        Options none
+        AllowOverride Limit
+        Require all granted
+</Directory>
+
+# vim /etc/phpMyAdmin/config.inc.php
+
+/* Authentication type */
+$cfg['Servers'][$i]['auth_type']     = 'http';    
+
+# systemctl restart httpd
+
+/phpmyadmin
+
+bind servido 1
+
+
+
+
+
+
+
+
+
+servidor de email
+

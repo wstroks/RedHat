@@ -1,0 +1,45 @@
+[global]
+
+map to guest = bad user
+
+recycle:keeptree = yes
+recycle:versions = yes
+recycle:repository = /lixeira/
+recycle:exclude = *.tmp;*.bkp
+
+[publica]
+
+path = /publica/
+writable = yes
+read only = no
+guest ok = yes
+browseable = yes
+
+vfs objects = recycle
+veto files = *.exe/*.com/*.bat/*.sys
+
+
+[financeiro]
+
+path = /financeiro/
+writable = yes
+read only =no
+browseable = yes
+valid users= +financeiro
+
+[admin]
+
+path = /admin/
+writable = yes
+read only = no
+browseable = yes
+valid users = +admin
+
+[lixeira]
+
+path = /lixeira/
+writable = yes
+read only = no
+browseable = yes
+
+
