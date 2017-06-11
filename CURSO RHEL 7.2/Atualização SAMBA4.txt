@@ -1,0 +1,82 @@
+*** Certifique-se que o NAMED esteja instalado e os arquivos hosts e resolv.conf estejam devidamente configurados
+systemctl status named
+vi /etc/named.conf
+vi /etc/hosts
+vi /etc/resolv.conf
+# systemctl stop firewalld
+# systemctl disable firewalld
+
+# vim /etc/selinux/config
+SELINUX=disabled
+
+# setenforce 0
+
+
+# vim /etc/sysctl.conf
+
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+
+
+# yum install perl gcc attr libacl-devel libblkid-devel gnutls-devel readline-devel python-devel gdb pkgconfig krb5-workstation zlib-devel setroubleshoot-server libaio-devel setroubleshoot-plugins policycoreutils-python libsemanage-python perl-ExtUtils-MakeMaker perl-Parse-Yapp perl-Test-Base popt-devel libxml2-devel libattr-devel keyutils-libs-devel cups-devel bind-utils libxslt docbook-style-xsl openldap-devel autoconf python-crypto pam-devel ntp wget
+
+
+
+# cd /opt/
+# wget -c https://ftp.samba.org/pub/samba/samba-latest.tar.gz 
+# tar -zxvf samba-latest.tar.gz
+# cd samba[vesao]
+
+
+# ./configure --prefix /usr --enable-fhs --enable-cups --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd 
+
+# make
+# make install
+
+# ldconfig
+
+# rm /etc/krb5.conf
+# samba-tool domain provision 
+vc tem que por a primeira letra da senha maiuscula se não n atende aos requisitos Minhaempresa123
+
+# cp /var/lib/samba/private/krb5.conf /etc 
+
+# vim /lib/systemd/system/samba-ad-dc.service
+
+[Unit]
+Description=Samba4 AD DC
+After=network.target remote-fs.target nss-lookup.target 
+
+[Service]
+Type=forking
+LimitNOFILE=16384
+ExecStart=/usr/sbin/samba -D
+ExecReload=/usr/bin/kill -HUP $MAINPID
+PIDFile=/var/run/samba/samba.pid 
+
+[Install]
+
+WantedBy=multi-user.target
+
+# systemctl daemon-reload 
+
+# systemctl enable samba-ad-dc
+# systemctl start samba-ad-dc 
+
+
+# vim /etc/named.conf
+
+tkey-gssapi-keytab "/var/lib/samba/private/dns.keytab"; inicio
+include "/var/lib/samba/private/named.conf"; final
+
+# chgrp named /var/lib/samba/private/dns.keytab
+# chmod g+r /var/lib/samba/private/dns.keytab
+
+# systemctl restart named
+
+# samba-tool domain provision
+
+# samba_dnsupdate --verbose
+
+# systemctl restart samba-ad-dc
+
